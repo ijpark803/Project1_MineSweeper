@@ -41,9 +41,11 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = (TextView) view;
         if (tv.getCurrentTextColor() == Color.GRAY) {
             tv.setTextColor(Color.GREEN);
+            tv.setBackgroundColor(Color.LTGRAY);
         }
         else {
             tv.setTextColor(Color.GRAY);
+            tv.setBackgroundColor(Color.GRAY);
         }
     }
 }
