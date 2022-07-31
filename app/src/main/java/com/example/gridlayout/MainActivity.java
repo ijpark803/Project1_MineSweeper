@@ -40,10 +40,12 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view){
         TextView tv = (TextView) view;
         if (tv.getCurrentTextColor() == Color.GRAY) {
+            // make it visible
             tv.setTextColor(Color.GREEN);
             tv.setBackgroundColor(Color.LTGRAY);
         }
         else {
+            // make it invisible
             tv.setTextColor(Color.GRAY);
             tv.setBackgroundColor(Color.GRAY);
         }
