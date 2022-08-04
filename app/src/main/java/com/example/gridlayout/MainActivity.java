@@ -10,7 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final int COLUMN_COUNT = 2;
+
+    // save the TextViews of all cells in an array, so later on,
+    // when a TextView is clicked, we know which cell it is
+    private ArrayList<TextView> cell_tvs;
 
     private int dpToPixel(int dp) {
         float density = Resources.getSystem().getDisplayMetrics().density;
@@ -22,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // (1) adding four statically created cells
+        cell_tvs = new ArrayList<TextView>();
+
+        // Method (1): add statically created cells
         TextView tv00 = (TextView) findViewById(R.id.textView00);
         TextView tv01 = (TextView) findViewById(R.id.textView01);
         TextView tv10 = (TextView) findViewById(R.id.textView10);
@@ -44,15 +54,19 @@ public class MainActivity extends AppCompatActivity {
         tv11.setBackgroundColor(Color.GRAY);
         tv11.setOnClickListener(this::onClickTV);
 
-        // (2) adding four dynamically created cells
+        cell_tvs.add(tv00);
+        cell_tvs.add(tv01);
+        cell_tvs.add(tv10);
+        cell_tvs.add(tv11);
+
+        // Method (2): add four dynamically created cells
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
-        grid.setRowCount(4);
         for (int i = 2; i<=3; i++) {
             for (int j=0; j<=1; j++) {
                 TextView tv = new TextView(this);
                 tv.setHeight( dpToPixel(64) );
                 tv.setWidth( dpToPixel(64) );
-                tv.setText(String.valueOf(i)+String.valueOf(j));
+                tv.setTextSize( 32 );//dpToPixel(32) );
                 tv.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.GRAY);
@@ -64,16 +78,17 @@ public class MainActivity extends AppCompatActivity {
                 lp.columnSpec = GridLayout.spec(j);
 
                 grid.addView(tv, lp);
+
+                cell_tvs.add(tv);
             }
         }
 
-        // (3) adding four dynamically created cells with LayoutInflater
-        grid.setRowCount(6);
+        // Method (3): add four dynamically created cells with LayoutInflater
         LayoutInflater li = LayoutInflater.from(this);
         for (int i = 4; i<=5; i++) {
             for (int j=0; j<=1; j++) {
                 TextView tv = (TextView) li.inflate(R.layout.custom_cell_layout, grid, false);
-                tv.setText(String.valueOf(i)+String.valueOf(j));
+                //tv.setText(String.valueOf(i)+String.valueOf(j));
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.GRAY);
                 tv.setOnClickListener(this::onClickTV);
@@ -84,20 +99,30 @@ public class MainActivity extends AppCompatActivity {
 
                 grid.addView(tv, lp);
 
+                cell_tvs.add(tv);
             }
         }
 
     }
 
+    private int findIndexOfCellTextView(TextView tv) {
+        for (int n=0; n<cell_tvs.size(); n++) {
+            if (cell_tvs.get(n) == tv)
+                return n;
+        }
+        return -1;
+    }
+
     public void onClickTV(View view){
         TextView tv = (TextView) view;
+        int n = findIndexOfCellTextView(tv);
+        int i = n/COLUMN_COUNT;
+        int j = n%COLUMN_COUNT;
+        tv.setText(String.valueOf(i)+String.valueOf(j));
         if (tv.getCurrentTextColor() == Color.GRAY) {
-            // make it visible
             tv.setTextColor(Color.GREEN);
             tv.setBackgroundColor(Color.LTGRAY);
-        }
-        else {
-            // make it invisible
+        }else {
             tv.setTextColor(Color.GRAY);
             tv.setBackgroundColor(Color.GRAY);
         }

@@ -10,5 +10,6 @@
     android:height="64dp"
     android:width="64dp"
     android:text="00"
+    android:textSize="32sp"
     android:textAlignment="center">
 </TextView>
