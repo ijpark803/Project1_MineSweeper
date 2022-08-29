@@ -121,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(String.valueOf(i)+String.valueOf(j));
         if (tv.getCurrentTextColor() == Color.GRAY) {
             tv.setTextColor(Color.GREEN);
-            tv.setBackgroundColor(Color.LTGRAY);
+            tv.setBackgroundColor(Color.parseColor("lime"));
         }else {
             tv.setTextColor(Color.GRAY);
-            tv.setBackgroundColor(Color.GRAY);
+            tv.setBackgroundColor(Color.LTGRAY);
         }
     }
 }
