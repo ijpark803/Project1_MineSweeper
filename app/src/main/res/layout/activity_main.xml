@@ -10,19 +10,39 @@
         android:id="@+id/gridLayout01"
         android:layout_width="wrap_content"
         android:layout_height="400dp"
-        android:layout_marginStart="2dp"
+        android:layout_gravity="top|center"
         android:layout_marginTop="2dp"
-        android:layout_marginEnd="2dp"
         android:layout_marginBottom="2dp"
-        android:verticalSpacing="1dp"
+        android:gravity="center"
         android:horizontalSpacing="1dp"
-        app:rowCount="12"
+        android:verticalSpacing="1dp"
         app:columnCount="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_gravity="top|center"
-        />
+        app:rowCount="12" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="1000dp">
+
+        <ToggleButton
+            android:id="@+id/modeToggleButton"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:minWidth="48dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentBottom = "true"
+            android:scaleType="fitCenter"
+            android:textOn=""
+            android:checked="true" />
+    </RelativeLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,14 +8,20 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int COLUMN_COUNT = 10;
     private static final int numFlags = 4;
+    ImageButton butt;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -32,6 +38,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         cell_tvs = new ArrayList<TextView>();
+
+        Random rand = new Random();
+        Set mine_rows =new HashSet<Integer>();
+        Set mine_cols =new HashSet<Integer>();
+        while(mine_rows.size() < numFlags){
+            //random generate rows and cols for min position
+            int temp = rand.nextInt(12);
+            mine_rows.add(temp);
+        }
+        while(mine_cols.size() < numFlags) {
+            //random generate rows and cols for min position
+            int temp = rand.nextInt(10);
+            mine_cols.add(temp);
+        }
+        System.out.println(mine_rows);
+        System.out.println(mine_cols);
+
+        ToggleButton toggleButton = findViewById(R.id.modeToggleButton);
+        toggleButton.setBackgroundResource(R.drawable.custom_toggle_button_background);
+
+
 
         // Method (2): add four dynamically created cells
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
@@ -84,4 +111,6 @@ public class MainActivity extends AppCompatActivity {
             tv.setBackgroundColor(Color.parseColor("lime"));
         }
     }
+
+
 }
