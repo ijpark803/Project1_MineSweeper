@@ -40,8 +40,52 @@
             android:layout_centerInParent="true"
             android:layout_alignParentBottom = "true"
             android:scaleType="fitCenter"
-            android:textOn=""
+            android:textOn="@string/flag"
+            android:textOff="@string/pick"
+            android:textSize="30sp"
             android:checked="true" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            android:text="@string/clock"
+            android:textSize="40sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="200dp"/>
+        <TextView
+            android:id="@+id/timerText"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            android:text="placeholder"
+            android:textSize="40sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="260dp"/>
+
+        <TextView
+            android:id="@+id/numFlagsText"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            android:text="placeholder"
+            android:textSize="40sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="100dp"/>
+        <TextView
+            android:id="@+id/NumFlags"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:gravity="center_vertical"
+            android:padding="15dp"
+            android:text="@string/flag"
+            android:textSize="40sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"/>
     </RelativeLayout>
 
 

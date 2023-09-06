@@ -55,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(mine_rows);
         System.out.println(mine_cols);
 
-        ToggleButton toggleButton = findViewById(R.id.modeToggleButton);
-        toggleButton.setBackgroundResource(R.drawable.custom_toggle_button_background);
+        //set the text of the number of flags
+        TextView numberTextView = findViewById(R.id.numFlagsText);
+        numberTextView.setText(String.valueOf(numFlags));
 
+        //set the text of timer
+        TextView timerText = findViewById(R.id.timerText);
+        timerText.setText(String.valueOf(10));
 
 
         // Method (2): add four dynamically created cells
@@ -103,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
         int j = n%COLUMN_COUNT;
         tv.setText(String.valueOf(i)+String.valueOf(j));
         if (tv.getCurrentTextColor() == Color.parseColor("lime")) {
+            //this means that player is flagging
+            if(currentMode() == true){
+
+            }
+            else{
+                //add code
+            }
             tv.setTextColor(Color.GRAY);
             tv.setBackgroundColor(Color.GRAY);
         }
@@ -110,6 +121,13 @@ public class MainActivity extends AppCompatActivity {
             tv.setTextColor(Color.parseColor("lime"));
             tv.setBackgroundColor(Color.parseColor("lime"));
         }
+    }
+    public boolean currentMode(){
+        ToggleButton toggleButton = findViewById(R.id.modeToggleButton);
+        if(toggleButton.isChecked()){
+            return true;
+        }
+        else return false;
     }
 
 
