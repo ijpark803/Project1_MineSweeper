@@ -6,6 +6,7 @@ import androidx.gridlayout.widget.GridLayout;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,10 +19,13 @@ import java.util.Random;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final int COLUMN_COUNT = 10;
     private static final int numFlags = 4;
-    ImageButton butt;
+    private static int placedFlags = 4;
+    private int clock = 0;
+    private boolean running = false;
+    private boolean win = false;
+    Game g = new Game();
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -36,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         cell_tvs = new ArrayList<TextView>();
 
         Random rand = new Random();
@@ -52,23 +55,37 @@ public class MainActivity extends AppCompatActivity {
             int temp = rand.nextInt(10);
             mine_cols.add(temp);
         }
-        System.out.println(mine_rows);
-        System.out.println(mine_cols);
+        //convert to arraylist so that i can use indexOf() or contains()
+        ArrayList<Integer> mine_r = new ArrayList<>(mine_rows);
+        ArrayList<Integer> mine_c = new ArrayList<>(mine_cols);
+
+        //for testing
+        for(int i = 0;i < 4; i++){
+            System.out.println(Integer.toString(mine_r.get(i)) + "," +  Integer.toString(mine_c.get(i)));
+        }
+
+        //timer
+        if (savedInstanceState != null) {
+            clock = savedInstanceState.getInt("clock");
+            running = savedInstanceState.getBoolean("running");
+        }
+        runTimer();
+        running = true;
 
         //set the text of the number of flags
         TextView numberTextView = findViewById(R.id.numFlagsText);
-        numberTextView.setText(String.valueOf(numFlags));
+        numberTextView.setText(String.valueOf(placedFlags));
 
         //set the text of timer
         TextView timerText = findViewById(R.id.timerText);
         timerText.setText(String.valueOf(10));
-
 
         // Method (2): add four dynamically created cells
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
         for (int i = 0; i<12; i++) {
             for (int j=0; j<10; j++) {
                 TextView tv = new TextView(this);
+
                 tv.setHeight( dpToPixel(32) );
                 tv.setWidth( dpToPixel(32) );
                 tv.setTextSize( 16 );//dpToPixel(32) );
@@ -76,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(Color.parseColor("lime"));
                 tv.setBackgroundColor(Color.parseColor("lime"));
                 tv.setOnClickListener(this::onClickTV);
-//                tv.setText("@string/mine");
 
                 GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
                // lp.setMargins(dpToPixel(1), dpToPixel(2), dpToPixel(2), dpToPixel(2));
@@ -88,8 +104,60 @@ public class MainActivity extends AppCompatActivity {
                 grid.addView(tv, lp);
 
                 cell_tvs.add(tv);
+
+                boolean bomb = false;
+                if(mine_r.indexOf(i) != -1){
+                    int idx = mine_r.indexOf(i);
+                    if(mine_c.get(idx) == j) {
+                        bomb = true;
+                        //System.out.println("bomb at " +  Integer.toString(i) +  Integer.toString(j));
+                    }
+                }
+
+                Cell temp = new Cell(i, j, false, false, bomb);
+                g.addCell(temp);
+
             }
         }
+    }
+
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("clock", clock);
+        savedInstanceState.putBoolean("running", running);
+        if(win == true){
+            running = false;
+        }
+    }
+
+
+//    public void onClickStop(View view) {
+//        running = false;
+//    }
+//    public void onClickClear(View view) {
+//        running = false;
+//        clock = 0;
+//    }
+
+    private void runTimer() {
+        final TextView timeView = (TextView) findViewById(R.id.timerText);
+        final Handler handler = new Handler();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                int hours =clock/3600;
+                int minutes = (clock%3600) / 60;
+                int seconds = clock%60;
+                String time = String.format("%d:%02d:%02d", hours, minutes, seconds);
+                timeView.setText(Integer.toString(seconds));
+
+                if (running) {
+                    clock++;
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
     }
 
     private int findIndexOfCellTextView(TextView tv) {
@@ -109,8 +177,9 @@ public class MainActivity extends AppCompatActivity {
         if (tv.getCurrentTextColor() == Color.parseColor("lime")) {
             //this means that player is flagging
             if(currentMode() == true){
-
+                placedFlags--;
             }
+            //digging mode
             else{
                 //add code
             }
@@ -131,4 +200,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
 }
+
+class Game {
+    ArrayList<Cell> bank;
+
+    public Game(){
+        ArrayList<Cell> carr= new ArrayList<Cell>();
+        this.bank = carr;
+    }
+
+    public void addCell(Cell c){
+        bank.add(c);
+    }
+
+
+}
+
+class Cell {
+    boolean isFlagged;
+    boolean isVisible;
+    boolean hasMine;
+    int r;
+    int c;
+    public Cell(int r, int c, boolean isFlagged, boolean isVisible, boolean hasMine) {
+        this.r = r;
+        this.c = c;
+        this.isFlagged = isFlagged;
+        this.isVisible = isVisible;
+        this.hasMine = hasMine;
+    }
+
+}
+
+
