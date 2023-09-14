@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
     private boolean win = false;
     Game g = new Game();
+    private int clicks = 0;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -173,18 +175,34 @@ public class MainActivity extends AppCompatActivity {
         int n = findIndexOfCellTextView(tv);
         int i = n/COLUMN_COUNT;
         int j = n%COLUMN_COUNT;
-        tv.setText(String.valueOf(i)+String.valueOf(j));
+        //tv.setText(String.valueOf(i)+String.valueOf(j));
+        Cell curr = g.findCell(i, j);
         if (tv.getCurrentTextColor() == Color.parseColor("lime")) {
             //this means that player is flagging
             if(currentMode() == true){
                 placedFlags--;
+                TextView numberTextView = findViewById(R.id.numFlagsText);
+                numberTextView.setText(String.valueOf(placedFlags));
+                String flagText = getResources().getString(R.string.flag);
+                tv.setText(flagText);
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                tv.setPadding(0, 4, 0, 0);
+                curr.isFlagged = true;
             }
             //digging mode
             else{
                 //add code
+                clicks++;
+                if(clicks == 1){
+                    //display the board up to when we arrive at cells with adjacent bombs
+                }
+                else{
+
+                }
+
             }
-            tv.setTextColor(Color.GRAY);
-            tv.setBackgroundColor(Color.GRAY);
+//            tv.setTextColor(Color.GRAY);
+//            tv.setBackgroundColor(Color.GRAY);
         }
         else {
             tv.setTextColor(Color.parseColor("lime"));
@@ -214,6 +232,13 @@ class Game {
 
     public void addCell(Cell c){
         bank.add(c);
+    }
+    public Cell findCell(int r, int c){
+        for(int i = 0; i < bank.size(); i++){
+            Cell temp = bank.get(i);
+            if(temp.r  == r && temp.c == c) return temp;
+        }
+        return null;
     }
 
 
