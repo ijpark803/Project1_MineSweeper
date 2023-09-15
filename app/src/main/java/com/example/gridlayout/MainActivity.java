@@ -23,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int COLUMN_COUNT = 10;
     private static final int numFlags = 4;
     private static int placedFlags = 4;
+    Game g = new Game();
     private int clock = 0;
     private boolean running = false;
     private boolean win = false;
-    Game g = new Game();
     private int clicks = 0;
 
     // save the TextViews of all cells in an array, so later on,
@@ -45,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         cell_tvs = new ArrayList<TextView>();
 
         Random rand = new Random();
-        Set mine_rows =new HashSet<Integer>();
-        Set mine_cols =new HashSet<Integer>();
-        while(mine_rows.size() < numFlags){
+        Set mine_rows = new HashSet<Integer>();
+        Set mine_cols = new HashSet<Integer>();
+        while (mine_rows.size() < numFlags) {
             //random generate rows and cols for min position
             int temp = rand.nextInt(12);
             mine_rows.add(temp);
         }
-        while(mine_cols.size() < numFlags) {
+        while (mine_cols.size() < numFlags) {
             //random generate rows and cols for min position
             int temp = rand.nextInt(10);
             mine_cols.add(temp);
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Integer> mine_c = new ArrayList<>(mine_cols);
 
         //for testing
-        for(int i = 0;i < 4; i++){
-            System.out.println(Integer.toString(mine_r.get(i)) + "," +  Integer.toString(mine_c.get(i)));
+        for (int i = 0; i < 4; i++) {
+            System.out.println(Integer.toString(mine_r.get(i)) + "," + Integer.toString(mine_c.get(i)));
         }
 
         //timer
@@ -84,20 +84,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Method (2): add four dynamically created cells
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
-        for (int i = 0; i<12; i++) {
-            for (int j=0; j<10; j++) {
+        for (int i = 0; i < 12; i++) {
+            for (int j = 0; j < 10; j++) {
                 TextView tv = new TextView(this);
 
-                tv.setHeight( dpToPixel(32) );
-                tv.setWidth( dpToPixel(32) );
-                tv.setTextSize( 16 );//dpToPixel(32) );
+                tv.setHeight(dpToPixel(32));
+                tv.setWidth(dpToPixel(32));
+                tv.setTextSize(16);//dpToPixel(32) );
                 tv.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
                 tv.setTextColor(Color.parseColor("lime"));
                 tv.setBackgroundColor(Color.parseColor("lime"));
                 tv.setOnClickListener(this::onClickTV);
 
                 GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
-               // lp.setMargins(dpToPixel(1), dpToPixel(2), dpToPixel(2), dpToPixel(2));
+                // lp.setMargins(dpToPixel(1), dpToPixel(2), dpToPixel(2), dpToPixel(2));
                 lp.rowSpec = GridLayout.spec(i);
                 lp.columnSpec = GridLayout.spec(j);
                 lp.leftMargin = 2;
@@ -108,15 +108,15 @@ public class MainActivity extends AppCompatActivity {
                 cell_tvs.add(tv);
 
                 boolean bomb = false;
-                if(mine_r.indexOf(i) != -1){
+                if (mine_r.indexOf(i) != -1) {
                     int idx = mine_r.indexOf(i);
-                    if(mine_c.get(idx) == j) {
+                    if (mine_c.get(idx) == j) {
                         bomb = true;
                         //System.out.println("bomb at " +  Integer.toString(i) +  Integer.toString(j));
                     }
                 }
 
-                Cell temp = new Cell(i, j, false, false, bomb);
+                Cell temp = new Cell(i, j, false, false, bomb, tv);
                 g.addCell(temp);
 
             }
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt("clock", clock);
         savedInstanceState.putBoolean("running", running);
-        if(win == true){
+        if (win == true) {
             running = false;
         }
     }
@@ -148,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                int hours =clock/3600;
-                int minutes = (clock%3600) / 60;
-                int seconds = clock%60;
+                int hours = clock / 3600;
+                int minutes = (clock % 3600) / 60;
+                int seconds = clock % 60;
                 String time = String.format("%d:%02d:%02d", hours, minutes, seconds);
                 timeView.setText(Integer.toString(seconds));
 
@@ -163,23 +163,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int findIndexOfCellTextView(TextView tv) {
-        for (int n=0; n<cell_tvs.size(); n++) {
+        for (int n = 0; n < cell_tvs.size(); n++) {
             if (cell_tvs.get(n) == tv)
                 return n;
         }
         return -1;
     }
 
-    public void onClickTV(View view){
+    public void onClickTV(View view) {
         TextView tv = (TextView) view;
         int n = findIndexOfCellTextView(tv);
-        int i = n/COLUMN_COUNT;
-        int j = n%COLUMN_COUNT;
+        int i = n / COLUMN_COUNT;
+        int j = n % COLUMN_COUNT;
         //tv.setText(String.valueOf(i)+String.valueOf(j));
         Cell curr = g.findCell(i, j);
         if (tv.getCurrentTextColor() == Color.parseColor("lime")) {
             //this means that player is flagging
-            if(currentMode() == true){
+            if (currentMode() == true) {
+                if (curr.isFlagged == true) return;
+                if (curr.isVisible == true) return;
                 placedFlags--;
                 TextView numberTextView = findViewById(R.id.numFlagsText);
                 numberTextView.setText(String.valueOf(placedFlags));
@@ -190,53 +192,99 @@ public class MainActivity extends AppCompatActivity {
                 curr.isFlagged = true;
             }
             //digging mode
-            else{
-                //add code
-                clicks++;
-                if(clicks == 1){
-                    //display the board up to when we arrive at cells with adjacent bombs
+            else {
+                if (curr.hasMine == true) {
+                    String bombtext = getResources().getString(R.string.mine);
+                    tv.setBackgroundColor(Color.RED);
+                    tv.setText(bombtext); // For example, display a 'B' to indicate a bomb
+                    win = false;
+                    return;
                 }
-                else{
-
-                }
-
+                revealCells(i, j);
             }
-//            tv.setTextColor(Color.GRAY);
-//            tv.setBackgroundColor(Color.GRAY);
-        }
-        else {
-            tv.setTextColor(Color.parseColor("lime"));
-            tv.setBackgroundColor(Color.parseColor("lime"));
+
         }
     }
-    public boolean currentMode(){
+
+    public boolean currentMode() {
         ToggleButton toggleButton = findViewById(R.id.modeToggleButton);
-        if(toggleButton.isChecked()){
+        if (toggleButton.isChecked()) {
             return true;
-        }
-        else return false;
+        } else return false;
     }
 
+    private void revealCells(int row, int col) {
+        Cell curr = g.findCell(row, col);
+        TextView tv = curr.tv;
+        if (curr.isVisible) return;
+        curr.isVisible = true;
+        // Display the number of adjacent bombs, or recursively reveal neighbors if there are none
+        int adjacentBombs = countAdjacentBombs(row, col);
+        tv.setBackgroundColor(Color.GRAY);
+        tv.setTextColor(Color.WHITE);
+        if (adjacentBombs > 0) {
+            tv.setText(String.valueOf(adjacentBombs));
+            return;
+        } else {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+
+                    int newRow = row + i;
+                    int newCol = col + j;
+                    //System.out.println(newRow + " " + newCol);
+                    if (isValid(newRow, newCol)) {
+                        System.out.println("revealing " + newRow + newCol);
+                        revealCells(newRow, newCol);
+                    }
+                }
+            }
+        }
 
 
+    }
+
+    private int countAdjacentBombs(int row, int col) {
+        Cell curr = g.findCell(row, col);
+        if (curr.hasMine == true) return -1;
+        int count = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int newRow = row + i;
+                int newCol = col + j;
+                if (isValid(newRow, newCol)) {
+                    Cell neighbor = g.findCell(newRow, newCol);
+                    if (neighbor.hasMine == true) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    boolean isValid(int r, int c) {
+        if (r < 0 || c < 0 || r >= 12 || c >= 10) return false;
+        return true;
+    }
 
 }
 
 class Game {
     ArrayList<Cell> bank;
 
-    public Game(){
-        ArrayList<Cell> carr= new ArrayList<Cell>();
+    public Game() {
+        ArrayList<Cell> carr = new ArrayList<Cell>();
         this.bank = carr;
     }
 
-    public void addCell(Cell c){
+    public void addCell(Cell c) {
         bank.add(c);
     }
-    public Cell findCell(int r, int c){
-        for(int i = 0; i < bank.size(); i++){
+
+    public Cell findCell(int r, int c) {
+        for (int i = 0; i < bank.size(); i++) {
             Cell temp = bank.get(i);
-            if(temp.r  == r && temp.c == c) return temp;
+            if (temp.r == r && temp.c == c) return temp;
         }
         return null;
     }
@@ -250,12 +298,15 @@ class Cell {
     boolean hasMine;
     int r;
     int c;
-    public Cell(int r, int c, boolean isFlagged, boolean isVisible, boolean hasMine) {
+    TextView tv;
+
+    public Cell(int r, int c, boolean isFlagged, boolean isVisible, boolean hasMine, TextView tv) {
         this.r = r;
         this.c = c;
         this.isFlagged = isFlagged;
         this.isVisible = isVisible;
         this.hasMine = hasMine;
+        this.tv = tv;
     }
 
 }
