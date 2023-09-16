@@ -3,12 +3,14 @@ package com.example.gridlayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.gridlayout.widget.GridLayout;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
     private boolean win = false;
     private int clicks = 0;
+    public boolean lastClick = true;
+    ArrayList<Integer> mine_r;
+    ArrayList<Integer> mine_c;
 
     // save the TextViews of all cells in an array, so later on,
     // when a TextView is clicked, we know which cell it is
@@ -58,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
             mine_cols.add(temp);
         }
         //convert to arraylist so that i can use indexOf() or contains()
-        ArrayList<Integer> mine_r = new ArrayList<>(mine_rows);
-        ArrayList<Integer> mine_c = new ArrayList<>(mine_cols);
+        mine_r = new ArrayList<>(mine_rows);
+        mine_c = new ArrayList<>(mine_cols);
 
         //for testing
         for (int i = 0; i < 4; i++) {
@@ -127,19 +132,10 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt("clock", clock);
         savedInstanceState.putBoolean("running", running);
-        if (win == true) {
+        if (lastClick == true) {
             running = false;
         }
     }
-
-
-//    public void onClickStop(View view) {
-//        running = false;
-//    }
-//    public void onClickClear(View view) {
-//        running = false;
-//        clock = 0;
-//    }
 
     private void runTimer() {
         final TextView timeView = (TextView) findViewById(R.id.timerText);
@@ -177,12 +173,29 @@ public class MainActivity extends AppCompatActivity {
         int j = n % COLUMN_COUNT;
         //tv.setText(String.valueOf(i)+String.valueOf(j));
         Cell curr = g.findCell(i, j);
+
         if (tv.getCurrentTextColor() == Color.parseColor("lime")) {
             //this means that player is flagging
             if (currentMode() == true) {
-                if (curr.isFlagged == true) return;
+//                if(placedFlags == 0){
+//                    boolean res = checkWin();
+//                    return;
+//                }
+                //already flagged, so unflag
+                if (curr.isFlagged == true) {
+                    if(curr.hasMine == true) win = true;
+                    placedFlags++;
+                    curr.isFlagged = false;
+                    tv.setText("");
+                    tv.setBackgroundColor(Color.parseColor("lime"));
+                    return;
+                }
+
+                //already visible
                 if (curr.isVisible == true) return;
+                //cell can be flagged
                 placedFlags--;
+                if(curr.hasMine == true) win = false;
                 TextView numberTextView = findViewById(R.id.numFlagsText);
                 numberTextView.setText(String.valueOf(placedFlags));
                 String flagText = getResources().getString(R.string.flag);
@@ -190,14 +203,27 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                 tv.setPadding(0, 4, 0, 0);
                 curr.isFlagged = true;
+                if(placedFlags == 0){
+                    showBombs();
+                    running = false;
+                    lastClick = true;
+                    //wait for a click then check win
+
+                }
             }
             //digging mode
             else {
+                if(curr.isFlagged) return;
+                clicks++;
                 if (curr.hasMine == true) {
                     String bombtext = getResources().getString(R.string.mine);
                     tv.setBackgroundColor(Color.RED);
                     tv.setText(bombtext); // For example, display a 'B' to indicate a bomb
                     win = false;
+                    showBombs();
+                    lastClick = true;
+                    running = false;
+                    //check for a click
                     return;
                 }
                 revealCells(i, j);
@@ -216,6 +242,10 @@ public class MainActivity extends AppCompatActivity {
     private void revealCells(int row, int col) {
         Cell curr = g.findCell(row, col);
         TextView tv = curr.tv;
+        if(curr.isFlagged == true && clicks == 1){
+            curr.isFlagged = false;
+            tv.setText("");
+        }
         if (curr.isVisible) return;
         curr.isVisible = true;
         // Display the number of adjacent bombs, or recursively reveal neighbors if there are none
@@ -264,6 +294,46 @@ public class MainActivity extends AppCompatActivity {
 
     boolean isValid(int r, int c) {
         if (r < 0 || c < 0 || r >= 12 || c >= 10) return false;
+        return true;
+    }
+
+    void checkWin(){
+
+
+        Intent intent = new Intent(this, ResultPage.class);
+        intent.putExtra("GAME_WON", win);
+        TextView timeView = (TextView) findViewById(R.id.timerText);
+        String temp = timeView.getText().toString();
+        intent.putExtra("seconds", temp);
+        System.out.println(temp + " plz");
+        intent.putExtra("time", temp);
+        startActivity(intent);
+    }
+
+    void showBombs(){
+        for(int i = 0 ;i < numFlags; i ++){
+            Cell bomb = g.findCell(mine_r.get(i), mine_c.get(i));
+            TextView tv = bomb.tv;
+            if(bomb.isFlagged == false) win = false;
+            else{
+                win = true;
+            }
+            String bombtext = getResources().getString(R.string.mine);
+            tv.setBackgroundColor(Color.RED);
+            tv.setText(bombtext);
+        }
+    }
+
+    public boolean onTouchEvent(MotionEvent event) {
+        // Get the coordinates of the click
+        float x = event.getX();
+        float y = event.getY();
+
+        // Handle the click event
+        // Add your code here...
+        if(lastClick = true) checkWin();
+
+        // Return true to indicate that the event has been handled
         return true;
     }
 
