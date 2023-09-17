@@ -16,7 +16,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-//import com.example.gridlayout.databinding.ActivityResultPageBinding;
 
 public class ResultPage extends AppCompatActivity {
 
@@ -26,37 +25,41 @@ public class ResultPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result_page);
+        if(savedInstanceState== null) {
+            setContentView(R.layout.activity_main2);
 
-        Intent intent = getIntent();
-        boolean won = intent.getBooleanExtra("GAME_WON", false);
-        String seconds = intent.getStringExtra("seconds");
-        System.out.println(seconds + " seconds");
-        TextView resultTextView = findViewById(R.id.textview_first);
+            Button restartButton = findViewById(R.id.button_first);
+            System.out.println(restartButton);
+            restartButton.setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     finish();
+                                                 }
 
-        String winning_msg = "";
-        if (won) {
-            winning_msg = "won";
-        } else {
-            winning_msg = "lost";
-        }
+                                             }
+            );
 
-        resultTextView.setText("Used " + seconds + " seconds.\n You " + winning_msg + ". ");
+            Intent intent = getIntent();
+            boolean won = intent.getBooleanExtra("GAME_WON", false);
+            String seconds = intent.getStringExtra("seconds");
+            System.out.println(seconds + " seconds");
+            TextView resultTextView = findViewById(R.id.textview_first);
 
-        Button restartButton = findViewById(R.id.button_first);
-        restartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Code to restart the game
-                finish(); // Close this activity
+            String winning_msg = "";
+            if (won) {
+                winning_msg = "won";
+            } else {
+                winning_msg = "lost";
             }
-        });
+
+            resultTextView.setText("Used " + seconds + " seconds.\n You " + winning_msg + ". ");
+        }
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_result_page);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
+//    @Override
+//    public boolean onSupportNavigateUp() {
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_result_page);
+//        return NavigationUI.navigateUp(navController, appBarConfiguration)
+//                || super.onSupportNavigateUp();
+//    }
 }

@@ -14,14 +14,23 @@
         android:theme="@style/Theme.GridLayout"
         tools:targetApi="31">
         <activity
+            android:name=".MainActivity2"
+            android:exported="false"
+            android:launchMode = "singleTask"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/Theme.GridLayout.NoActionBar" />
+        <activity
             android:name=".ResultPage"
             android:exported="false"
             android:label="@string/title_activity_result_page"
             android:theme="@style/Theme.GridLayout.NoActionBar" />
         <activity
             android:name=".MainActivity"
+            android:launchMode = "singleTask"
             android:exported="true">
+
             <intent-filter>
+
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

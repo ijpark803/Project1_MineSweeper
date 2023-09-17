@@ -12,6 +12,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -22,6 +23,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    public static final int RESULT_RESTART = 1;
     private static final int COLUMN_COUNT = 10;
     private static final int numFlags = 4;
     private static int placedFlags = 4;
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
     private boolean win = false;
     private int clicks = 0;
-    public boolean lastClick = true;
+    public boolean lastClick = false;
     ArrayList<Integer> mine_r;
     ArrayList<Integer> mine_c;
 
@@ -148,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 int minutes = (clock % 3600) / 60;
                 int seconds = clock % 60;
                 String time = String.format("%d:%02d:%02d", hours, minutes, seconds);
-                timeView.setText(Integer.toString(seconds));
+                timeView.setText(Integer.toString(clock));
 
                 if (running) {
                     clock++;
@@ -263,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
                     int newCol = col + j;
                     //System.out.println(newRow + " " + newCol);
                     if (isValid(newRow, newCol)) {
-                        System.out.println("revealing " + newRow + newCol);
+                        //System.out.println("revealing " + newRow + newCol);
                         revealCells(newRow, newCol);
                     }
                 }
@@ -307,7 +309,11 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("seconds", temp);
         System.out.println(temp + " plz");
         intent.putExtra("time", temp);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         startActivity(intent);
+        finish();
     }
 
     void showBombs(){
@@ -325,13 +331,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        // Get the coordinates of the click
-        float x = event.getX();
-        float y = event.getY();
-
-        // Handle the click event
-        // Add your code here...
-        if(lastClick = true) checkWin();
+        if(lastClick == true) {
+            checkWin();
+        }
 
         // Return true to indicate that the event has been handled
         return true;
